@@ -1,0 +1,13 @@
+torch
+transformers
+datasets
+accelerate
+peft
+bitsandbytes
+fastapi
+uvicorn
+pydantic
+numpy
+pandas
+jinja2
+trl

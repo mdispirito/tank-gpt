@@ -1,0 +1,15 @@
+services:
+  tank-gpt:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./assets:/app/assets
+      - ./src:/app/src
+    environment:
+      - PYTHONPATH=/app
+    command: >
+      sh -c "
+        echo 'starting tank-gpt...' &&
+        uvicorn src.server:app --host 0.0.0.0 --port 8000 --reload
+      "
