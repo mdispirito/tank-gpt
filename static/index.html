@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tank GPT Chatbot</title>
+    <link rel="stylesheet" href="/static/css/chat.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Tank GPT 🪖</h1>
+        <p>Argue with AI about Canucks management, or whatever else...</p>
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <!-- Messages will be added here dynamically -->
+    </div>
+    
+    <div class="input-container">
+        <input 
+            type="text" 
+            id="messageInput" 
+            placeholder="Type your message here..." 
+            maxlength="500"
+            autocomplete="off"
+        >
+        <button id="sendButton" disabled>Send</button>
+    </div>
+    
+    <div class="info-container">
+        <div>
+            <span id="statusIndicator" class="status-indicator offline"></span>
+            <span id="modelInfo">Model: Loading...</span>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="temperature">Temperature:</label>
+                <input type="range" id="temperature" min="0.1" max="2.0" step="0.1" value="0.7">
+                <span id="temperatureValue">0.7</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="maxLength">Max Length:</label>
+                <input type="number" id="maxLength" min="50" max="500" value="150">
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/chat.js"></script>
+</body>
+</html>
