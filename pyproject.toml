@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "tank-gpt"
+version = "0.1.0"
+description = "A fine-tuned TinyLlama chatbot that replicates a user's voice and tone from WhatsApp chats"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+# Core MLX dependencies
+mlx-lm = "^0.26.0"
+# Data processing
+transformers = "^4.53.3"
+datasets = "^4.0.0"
+# Web API
+fastapi = "^0.116.1"
+uvicorn = "^0.35.0"
+pydantic = "^2.11.7"
+# Utilities
+numpy = "*"
+torch = {version = "*", optional = true}
+peft = {version = "*", optional = true}
+
+[tool.poetry.extras]
+pytorch = ["torch", "peft"]
+all = ["torch", "peft"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+black = "*"
+isort = "*"
+flake8 = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+preprocess = "src.preprocess:main"
+finetune-pytorch = "src.finetune:main"
+finetune-mlx = "src.finetune_mlx:main"
+serve = "src.server:main"
