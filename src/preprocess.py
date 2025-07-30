@@ -74,7 +74,7 @@ def parse_whatsapp_chat(file_path: str) -> List[Dict]:
 
     return messages
 
-def create_training_data(messages: List[Dict], target_sender: str, context_window: int = 50) -> List[Dict]:
+def create_training_data(messages: List[Dict], target_sender: str, context_window: int = 5) -> List[Dict]:
     """
     Create training data specifically for the target sender's responses.
     Only includes examples where the target sender is responding to the conversation.
@@ -107,7 +107,7 @@ def create_training_data(messages: List[Dict], target_sender: str, context_windo
             for msg in context_messages:
                 conversation.append({
                     "role": "user", 
-                    "content": f"{msg['sender']}: {msg['message']}"
+                    "content": msg['message']
                 })
             
             # add target sender's response
@@ -131,15 +131,38 @@ def save_to_jsonl(data: List[Dict], output_file: str):
             json.dump(item, f, ensure_ascii=False)
             f.write('\n')
 
+def save_train_valid_split(data: List[Dict], output_dir: str):
+    """
+    Save training data split into train (90%) and validation (10%) JSONL files.
+    """
+    # Calculate split index
+    split_idx = int(len(data) * 0.9)
+    train_data = data[:split_idx]
+    valid_data = data[split_idx:]
+    
+    # Create output files
+    train_file = os.path.join(output_dir, 'train.jsonl')
+    valid_file = os.path.join(output_dir, 'valid.jsonl')
+    
+    # Save train data
+    save_to_jsonl(train_data, train_file)
+    print(f"Train data saved to: {train_file} ({len(train_data)} examples)")
+    
+    # Save validation data
+    save_to_jsonl(valid_data, valid_file)
+    print(f"Validation data saved to: {valid_file} ({len(valid_data)} examples)")
+    
+    return train_file, valid_file
+
 def main():
     parser = argparse.ArgumentParser(description='Convert whatsapp chat to JSONL for LLM fine-tuning')
-    parser.add_argument('input_file', nargs='?', default='assets/input/whatsapp_chat.txt', 
-                       help='Input WhatsApp chat file (default: assets/input/whatsapp_chat.txt)')
-    parser.add_argument('--output', '-o', default='assets/output/training_data.jsonl',
-                       help='Output JSONL file (default: assets/output/training_data.jsonl)')
+    parser.add_argument('input_file', nargs='?', default='data/input/whatsapp_chat.txt', 
+                       help='Input WhatsApp chat file (default: data/input/whatsapp_chat.txt)')
+    parser.add_argument('--output', '-o', default='data/',
+                       help='Output directory (default: data/)')
     parser.add_argument('--target-sender',
                        help='Name of the sender to generate training data for.')
-    parser.add_argument('--context-window', type=int, default=50,
+    parser.add_argument('--context-window', type=int, default=5,
                        help='Number of previous messages to include as context')
     parser.add_argument('--min-length', type=int, default=5,
                        help='Minimum message length to include')
@@ -170,11 +193,10 @@ def main():
     print(f"Created {len(training_data)} training examples for target sender {args.target_sender}")
     
     # create output directory if it doesn't exist
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    os.makedirs(args.output, exist_ok=True)
     
-    # save to JSONL
-    save_to_jsonl(training_data, args.output)
-    print(f"Training data saved to: {args.output}")
+    # save to train/valid split
+    train_file, valid_file = save_train_valid_split(training_data, args.output)
     
     # print sample data
     if training_data:
